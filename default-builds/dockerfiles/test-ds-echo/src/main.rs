@@ -27,10 +27,11 @@ async fn main() -> Result<()> {
 		tokio::spawn(with_select_term(echo_http_server(http_port)));
 	}
 
-	if let Ok(tcp_port) = env::var("TCP_PORT") {
-		let tcp_port: u16 = tcp_port.parse()?;
-		tokio::spawn(with_select_term(echo_tcp_server(tcp_port)));
-	}
+	let tcp_port: u16 = env::var("TCP_PORT")
+		.ok()
+		.and_then(|v| v.parse().ok())
+		.unwrap_or(6020);
+	tokio::spawn(with_select_term(echo_tcp_server(tcp_port)));
 
 	if let Ok(udp_port) = env::var("UDP_PORT") {
 		let udp_port: u16 = udp_port.parse()?;
